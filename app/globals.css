@@ -1,26 +1,26 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+:root { --background: #1b1511; --foreground: #f5e8cc; }
+@theme inline { --color-background: var(--background); --color-foreground: var(--foreground); }
+* { box-sizing: border-box; }
+body { background: #1b1511; color: #f5e8cc; font-family: Georgia, serif; margin: 0; }
+button, input, textarea, select { font: inherit; } button { cursor: pointer; }
+.darkroom { min-height: 100vh; padding: 25px clamp(18px, 5vw, 82px) 24px; }
+.darkroom-header, .darkroom-footer { align-items: center; display: flex; gap: 18px; font-family: "Courier New", monospace; font-size: 10px; letter-spacing: .15em; text-transform: uppercase; }
+.safelight { display: flex; gap: 4px; } .safelight span { background: #f5a25d; border-radius: 50%; display: block; height: 8px; width: 8px; } .safelight span:nth-child(2) { opacity: .55; } .safelight span:nth-child(3) { opacity: .25; }
+.lab-name { color: #f5a25d; } .lab-rule { background: #634c39; flex: 1; height: 1px; } .lab-note { color: #bca889; }
+.darkroom-hero { align-items: end; display: flex; justify-content: space-between; margin: clamp(82px, 15vh, 170px) auto 100px; max-width: 1280px; }
+.lab-label { color: #f5a25d; font-family: "Courier New", monospace; font-size: 10px; letter-spacing: .2em; margin: 0 0 18px; text-transform: uppercase; }
+.darkroom-hero h1 { font-size: clamp(58px, 9vw, 132px); font-weight: 400; letter-spacing: -.09em; line-height: .83; margin: 0; } .darkroom-hero h1 em, .tray-copy h2 em { color: #f5a25d; font-style: italic; }
+.exposure-readout { align-items: center; border: 1px solid #634c39; color: #bca889; display: flex; font-family: "Courier New", monospace; font-size: 11px; gap: 12px; min-width: 210px; padding: 18px; position: relative; text-transform: uppercase; } .readout-number { color: #f5a25d; font-size: 64px; line-height: .8; } .exposure-readout i { background: #f5a25d; bottom: 10px; height: 3px; left: 18px; position: absolute; right: 18px; }
+.contact-sheet { background: #f5e8cc; color: #1b1511; margin: 0 auto; max-width: 1280px; padding: clamp(24px, 4vw, 52px); }
+.sheet-head { align-items: end; display: flex; gap: 30px; justify-content: space-between; } .sheet-head .lab-label { color: #9b5a2f; margin-bottom: 10px; } .sheet-head h2 { font-size: clamp(34px, 5vw, 60px); font-weight: 400; letter-spacing: -.07em; margin: 0; }
+.darkroom-search { color: #9b5a2f; display: grid; font-family: "Courier New", monospace; font-size: 10px; gap: 8px; letter-spacing: .14em; max-width: 320px; text-transform: uppercase; width: 100%; } .darkroom-search input { background: transparent; border: 0; border-bottom: 1px solid #c4a779; color: #1b1511; outline: 0; padding: 10px 0; width: 100%; } .darkroom-search input:focus { border-color: #1b1511; }
+.proof-grid { display: grid; gap: 18px; grid-template-columns: repeat(3, 1fr); margin-top: 48px; } .proof { background: #201a16; color: #f5e8cc; min-height: 250px; padding: 19px; position: relative; } .proof::after { border: 1px solid #634c39; content: ""; inset: 7px; pointer-events: none; position: absolute; } .proof.featured { background: #3a2418; } .proof.archive { opacity: .68; }
+.proof-top, .proof-foot { align-items: center; display: flex; font-family: "Courier New", monospace; font-size: 9px; justify-content: space-between; letter-spacing: .1em; position: relative; text-transform: uppercase; z-index: 1; } .proof-top { color: #bca889; } .proof-top button { background: transparent; border: 0; color: #f5a25d; font-size: 9px; padding: 0; } .proof blockquote { font-size: clamp(22px, 2.5vw, 31px); line-height: 1.08; margin: 52px 10px 38px 0; position: relative; z-index: 1; } .proof-foot { bottom: 18px; color: #bca889; left: 19px; right: 19px; } .proof-foot strong { color: #f5e8cc; font-family: Georgia, serif; font-size: 15px; font-weight: 400; letter-spacing: 0; text-transform: none; } .proof-foot span { color: #f5a25d; }
+.empty-tray { color: #9b5a2f; font-family: "Courier New", monospace; padding: 40px 0; }
+.develop-tray { display: grid; gap: 50px; grid-template-columns: .8fr 1.2fr; margin: 88px auto 0; max-width: 1000px; } .tray-copy h2 { font-size: clamp(38px, 5vw, 65px); font-weight: 400; letter-spacing: -.08em; line-height: .9; margin: 0; } .tray-copy > p:last-child { color: #bca889; font-family: "Courier New", monospace; font-size: 12px; line-height: 1.6; margin-top: 28px; max-width: 260px; }
+.tray-form { border-top: 1px solid #634c39; padding-top: 2px; } .tray-form label { color: #bca889; display: grid; font-family: "Courier New", monospace; font-size: 10px; gap: 9px; letter-spacing: .12em; margin-top: 20px; text-transform: uppercase; } .tray-form input, .tray-form textarea, .tray-form select { background: transparent; border: 0; border-bottom: 1px solid #634c39; color: #f5e8cc; outline: 0; padding: 10px 0; resize: vertical; width: 100%; } .tray-form input:focus, .tray-form textarea:focus, .tray-form select:focus { border-color: #f5a25d; }
+.develop-button { align-items: center; background: #f5a25d; border: 0; color: #1b1511; display: flex; justify-content: space-between; margin-top: 27px; padding: 14px 16px; width: 100%; } .develop-button:hover { background: #f5e8cc; } .develop-button span { font-size: 22px; }
+.darkroom-footer { border-top: 1px solid #634c39; color: #bca889; justify-content: space-between; margin: 62px auto 0; max-width: 1280px; padding-top: 18px; }
+@media (max-width: 780px) { .lab-note { display: none; } .darkroom-hero { align-items: start; flex-direction: column; gap: 45px; margin: 85px auto 70px; } .darkroom-hero h1 { font-size: clamp(58px, 18vw, 92px); } .exposure-readout { min-width: 175px; } .sheet-head { align-items: stretch; flex-direction: column; } .darkroom-search { max-width: none; } .proof-grid { grid-template-columns: 1fr; margin-top: 35px; } .proof { min-height: 230px; } .develop-tray { grid-template-columns: 1fr; margin-top: 70px; } .darkroom-footer { align-items: start; flex-direction: column; gap: 8px; } }

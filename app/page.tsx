@@ -1,197 +1,67 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-function Shell({
-  title,
-  subtitle,
-  badge = "Portfolio demo · local-only",
-  children,
-}: {
-  title: string;
-  subtitle: string;
-  badge?: string;
-  children: ReactNode;
-}) {
-  return (
-    <div className="min-h-screen bg-zinc-50 text-zinc-900 dark:bg-black dark:text-zinc-100">
-      <div className="mx-auto max-w-6xl px-4 py-10">
-        <header className="mb-8">
-          <p className="text-xs font-medium uppercase tracking-wider text-zinc-500">{badge}</p>
-          <h1 className="mt-1 text-3xl font-semibold tracking-tight">{title}</h1>
-          <p className="mt-2 max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">{subtitle}</p>
-        </header>
-        {children}
-        <footer className="mt-10 border-t border-zinc-200 pt-4 text-xs text-zinc-500 dark:border-zinc-800">
-          Honest demo: no multi-tenant backend. State (if any) stays in this browser.
-        </footer>
-      </div>
-    </div>
-  );
-}
+type State = "Featured" | "Review" | "Archive";
+type Quote = { id: string; author: string; quote: string; state: State };
+const SEED: Quote[] = [{ id: "alex", author: "Alex", quote: "Shipped faster than expected.", state: "Featured" }];
+const STATES: State[] = ["Featured", "Review", "Archive"];
 
-function Button({
-  children,
-  onClick,
-  variant = "primary",
-  disabled,
-  type = "button",
-  className = "",
-}: {
-  children: ReactNode;
-  onClick?: () => void;
-  variant?: "primary" | "secondary" | "ghost" | "danger";
-  disabled?: boolean;
-  type?: "button" | "submit";
-  className?: string;
-}) {
-  const base =
-    "inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition disabled:opacity-50 " +
-    className;
-  const styles =
-    variant === "primary"
-      ? "bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-zinc-100 dark:text-zinc-900"
-      : variant === "secondary"
-        ? "bg-white text-zinc-900 ring-1 ring-zinc-200 hover:bg-zinc-100 dark:bg-zinc-900 dark:text-zinc-100 dark:ring-zinc-700"
-        : variant === "danger"
-          ? "bg-red-600 text-white hover:bg-red-500"
-          : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900";
-  return (
-    <button type={type} disabled={disabled} onClick={onClick} className={`${base} ${styles}`}>
-      {children}
-    </button>
-  );
-}
-
-const inputClass =
-  "w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm outline-none ring-zinc-400 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-950";
-
-function useLocalStorage<T>(key: string, initial: T) {
-  const [value, setValue] = useState<T>(initial);
+function useQuotes() {
+  const [quotes, setQuotes] = useState<Quote[]>(SEED);
   const [ready, setReady] = useState(false);
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(key);
-      if (raw != null) setValue(JSON.parse(raw) as T);
-    } catch {
-      /* ignore */
-    }
-    setReady(true);
-  }, [key]);
-  useEffect(() => {
-    if (!ready) return;
-    localStorage.setItem(key, JSON.stringify(value));
-  }, [key, value, ready]);
-  return [value, setValue] as const;
+  useEffect(() => { try { const raw = localStorage.getItem("testimonials-v2"); if (raw) setQuotes(JSON.parse(raw) as Quote[]); } catch { /* keep seed */ } setReady(true); }, []);
+  useEffect(() => { if (ready) localStorage.setItem("testimonials-v2", JSON.stringify(quotes)); }, [quotes, ready]);
+  return [quotes, setQuotes] as const;
 }
-
-function uid() {
-  return crypto.randomUUID();
-}
-
-async function copyText(text: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-
-type Item = { id: string; title: string; body: string; status: string; createdAt: number };
-
-const SEED: Item[] = [{"title": "Alex", "body": "Shipped faster than expected.", "status": "Featured"}].map((x: any, i: number) => ({
-  id: String(x.id ?? i + 1),
-  title: x.title,
-  body: x.body,
-  status: x.status,
-  createdAt: x.createdAt ?? Date.now() - i * 86400000,
-}));
-
-const FIELDS = [{"key": "title", "label": "Title", "type": "text"}, {"key": "body", "label": "Details", "type": "textarea"}, {"key": "status", "label": "Status", "type": "select", "options": ["Draft", "Active", "Done"]}] as { key: "title" | "body" | "status"; label: string; type: string; options?: string[] }[];
 
 export default function Home() {
-  const [items, setItems] = useLocalStorage<Item[]>("testimonials-v1", SEED);
+  const [quotes, setQuotes] = useQuotes();
   const [query, setQuery] = useState("");
-  const [draft, setDraft] = useState<Record<string, string>>(() =>
-    Object.fromEntries(FIELDS.map((f) => [f.key, f.options?.[0] ?? ""]))
-  );
-
-  const filtered = items.filter((it) =>
-    (it.title + it.body + it.status).toLowerCase().includes(query.toLowerCase())
-  );
-
-  const add = () => {
-    if (!String(draft.title || "").trim()) return;
-    setItems((prev) => [
-      {
-        id: uid(),
-        title: draft.title || "",
-        body: draft.body || "",
-        status: draft.status || "",
-        createdAt: Date.now(),
-      },
-      ...prev,
-    ]);
-    setDraft(Object.fromEntries(FIELDS.map((f) => [f.key, f.options?.[0] ?? ""])));
+  const [author, setAuthor] = useState("");
+  const [quote, setQuote] = useState("");
+  const [state, setState] = useState<State>("Review");
+  const visible = useMemo(() => quotes.filter((item) => `${item.author} ${item.quote} ${item.state}`.toLowerCase().includes(query.toLowerCase())), [quotes, query]);
+  const addQuote = () => {
+    if (!author.trim() || !quote.trim()) return;
+    setQuotes((current) => [{ id: crypto.randomUUID(), author: author.trim(), quote: quote.trim(), state }, ...current]);
+    setAuthor(""); setQuote(""); setState("Review");
   };
 
   return (
-    <Shell title="Testimonials" subtitle="Collect and feature quotes.">
-      <div className="mb-4 flex flex-wrap gap-2">
-        <input className={`${inputClass} max-w-sm`} placeholder="Search" value={query} onChange={(e) => setQuery(e.target.value)} />
-        <span className="self-center text-sm text-zinc-500">{filtered.length} items</span>
-      </div>
-      <div className="mb-6 grid gap-2 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950 md:grid-cols-2">
-        {FIELDS.map((f) => (
-          <label key={f.key} className="block space-y-1">
-            <span className="text-xs font-medium text-zinc-500">{f.label}</span>
-            {f.type === "textarea" ? (
-              <textarea
-                className={`${inputClass} min-h-[72px]`}
-                value={draft[f.key] || ""}
-                onChange={(e) => setDraft((d) => ({ ...d, [f.key]: e.target.value }))}
-              />
-            ) : f.type === "select" ? (
-              <select
-                className={inputClass}
-                value={draft[f.key] || ""}
-                onChange={(e) => setDraft((d) => ({ ...d, [f.key]: e.target.value }))}
-              >
-                {(f.options || []).map((o) => (
-                  <option key={o}>{o}</option>
-                ))}
-              </select>
-            ) : (
-              <input
-                className={inputClass}
-                value={draft[f.key] || ""}
-                onChange={(e) => setDraft((d) => ({ ...d, [f.key]: e.target.value }))}
-              />
-            )}
-          </label>
-        ))}
-        <div className="md:col-span-2">
-          <Button onClick={add}>Add</Button>
+    <main className="darkroom">
+      <header className="darkroom-header">
+        <div className="safelight"><span /><span /><span /></div>
+        <div className="lab-name">B / PROOF ROOM</div><div className="lab-rule" /><span className="lab-note">Contact sheet · local demo</span>
+      </header>
+      <section className="darkroom-hero">
+        <div><p className="lab-label">CUSTOMER VOICE / WORK PRINT</p><h1>Good work<br /><em>leaves a trace.</em></h1></div>
+        <div className="exposure-readout"><span className="readout-number">{String(quotes.length).padStart(2, "0")}</span><span>proofs in<br />the tray</span><i /></div>
+      </section>
+      <section className="contact-sheet" aria-label="Testimonials contact sheet">
+        <div className="sheet-head">
+          <div><p className="lab-label">CONTACT SHEET 001</p><h2>Selected voices</h2></div>
+          <label className="darkroom-search"><span>Read the margin</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search author or quote" /></label>
         </div>
-      </div>
-      <ul className="space-y-2">
-        {filtered.map((it) => (
-          <li key={it.id} className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-            <div className="flex flex-wrap items-start justify-between gap-2">
-              <div>
-                <div className="font-medium">{it.title}</div>
-                <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{it.body}</p>
-                <span className="mt-2 inline-block rounded-full bg-zinc-100 px-2 py-0.5 text-xs dark:bg-zinc-900">{it.status}</span>
-              </div>
-              <Button variant="ghost" onClick={() => setItems((prev) => prev.filter((x) => x.id !== it.id))}>
-                Delete
-              </Button>
-            </div>
-          </li>
-        ))}
-      </ul>
-    </Shell>
+        <div className="proof-grid">
+          {visible.length === 0 ? <p className="empty-tray">No proof found in this exposure.</p> : visible.map((item, index) => (
+            <article className={`proof ${item.state.toLowerCase()}`} key={item.id}>
+              <div className="proof-top"><span>FRAME {String(index + 1).padStart(2, "0")}</span><button aria-label={`Delete testimonial by ${item.author}`} onClick={() => setQuotes((current) => current.filter((entry) => entry.id !== item.id))}>REMOVE</button></div>
+              <blockquote>“{item.quote}”</blockquote><div className="proof-foot"><strong>{item.author}</strong><span>{item.state}</span></div>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="develop-tray">
+        <div className="tray-copy"><p className="lab-label">DEVELOP A NEW PROOF</p><h2>Put a voice<br /><em>in the light.</em></h2><p>Quotes added here stay in this browser. They are not published to a live site.</p></div>
+        <div className="tray-form">
+          <label><span>Author / company</span><input value={author} onChange={(event) => setAuthor(event.target.value)} placeholder="e.g. Alex" /></label>
+          <label><span>What did they say?</span><textarea value={quote} onChange={(event) => setQuote(event.target.value)} placeholder="A short, specific note..." rows={3} /></label>
+          <label><span>Proof state</span><select value={state} onChange={(event) => setState(event.target.value as State)}>{STATES.map((item) => <option key={item}>{item}</option>)}</select></label>
+          <button className="develop-button" onClick={addQuote}>Expose quote <span>+</span></button>
+        </div>
+      </section>
+      <footer className="darkroom-footer"><span>BOOKCHAOWALIT / TESTIMONIALS</span><span>NO FABRICATED RESULTS · LOCAL BROWSER STATE</span></footer>
+    </main>
   );
 }

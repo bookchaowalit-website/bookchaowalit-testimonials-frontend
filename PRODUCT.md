@@ -4,6 +4,11 @@
 **Generated:** 2026-08-11 (bulk Book Dev closeout)  
 **Status:** starter / portfolio boundary
 
+## Current product truth
+
+- This is a local-only testimonial collection and presentation demo with search, add, and delete actions.
+- Quotes are browser state; there is no moderation workflow, verification, publishing API, or analytics.
+
 ## Purpose
 
 Portfolio repository under Book Dev. This brief records ownership and the
