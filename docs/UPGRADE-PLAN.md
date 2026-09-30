@@ -2,11 +2,10 @@
 
 ## Current state
 
-Score: 7/10 (was 5/10) — full local CRUD with featured ordering, validated storage, tests and CI; no public embed yet.
+Score: 8/10 (was 7/10) — full local CRUD with featured ordering, validated storage, tests and CI, copyable static embed of featured quotes; no in-place editing yet.
 
 ## Backlog
 
-- P1: "Copy embed" output (HTML/JSON of featured quotes) so the curated set can be reused on a site.
 - P1: Edit quote text in place.
 - P2: Playwright smoke test for add / re-state / remove.
 
@@ -21,3 +20,4 @@ Score: 7/10 (was 5/10) — full local CRUD with featured ordering, validated sto
 ## Done in this pass (pass 2)
 
 - Canonical host is config-driven: `lib/site.ts` resolves `NEXT_PUBLIC_SITE_URL` (validated, clear error on a non-http(s) value) and feeds `metadataBase`, generated `app/sitemap.ts` / `app/robots.ts` and the MCP `get_app_info` URL; removed the stale template `public/sitemap.xml` / `robots.txt` (they pointed at `bookchaowalit.com` and a `*.vercel.app` name that differs from the project URL). Tested in `lib/site.test.ts`.
+- "Embed the featured quotes": static, HTML-escaped `<figure>` markup of every Featured proof in display order (`featuredEmbedHtml` in `lib/testimonials.ts`, tested incl. script-injection escaping), shown read-only with a Copy button and a visible status line.

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, type FormEvent } from "react";
-import { createQuote, MAX_AUTHOR, MAX_QUOTE, parseQuotes, STATES, visibleQuotes, type Quote, type State } from "@/lib/testimonials";
+import { createQuote, featuredEmbedHtml, MAX_AUTHOR, MAX_QUOTE, parseQuotes, STATES, visibleQuotes, type Quote, type State } from "@/lib/testimonials";
 import { useStoredState } from "@/lib/use-stored-state";
 
 const SEED: Quote[] = [{ id: "alex", author: "Alex", quote: "Shipped faster than expected.", state: "Featured" }];
@@ -20,6 +20,16 @@ export default function Home() {
     if ("error" in next) { setNotice(next.error); return; }
     setQuotes((current) => [next, ...current]);
     setAuthor(""); setQuote(""); setState("Review"); setNotice(`Quote from ${next.author} added to the tray.`);
+  };
+  const embed = useMemo(() => featuredEmbedHtml(quotes), [quotes]);
+  const [embedNotice, setEmbedNotice] = useState("");
+  const copyEmbed = async () => {
+    try {
+      await navigator.clipboard.writeText(embed);
+      setEmbedNotice("Embed HTML for the featured quotes copied.");
+    } catch {
+      setEmbedNotice("The browser blocked clipboard access; select the HTML below instead.");
+    }
   };
   const restate = (id: string, next: State) => setQuotes((current) => current.map((entry) => entry.id === id ? { ...entry, state: next } : entry));
 
@@ -46,6 +56,15 @@ export default function Home() {
             </article>
           ))}
         </div>
+        <details className="embed-panel">
+          <summary>Embed the featured quotes</summary>
+          {embed ? <>
+            <p>Static, escaped HTML of every <strong>Featured</strong> proof in the order above. Style it with your site&apos;s CSS.</p>
+            <label><span className="sr-only">Embed HTML</span><textarea readOnly value={embed} rows={8} spellCheck={false} /></label>
+            <button type="button" onClick={copyEmbed}>Copy embed HTML</button>
+          </> : <p>Set a proof&apos;s state to Featured to include it in the embed.</p>}
+          <p className="embed-notice" role="status">{embedNotice}</p>
+        </details>
       </section>
       <section className="develop-tray">
         <div className="tray-copy"><p className="lab-label">DEVELOP A NEW PROOF</p><h2>Put a voice<br /><em>in the light.</em></h2><p>Quotes added here stay in this browser. They are not published to a live site.</p></div>

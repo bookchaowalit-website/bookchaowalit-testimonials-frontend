@@ -5,6 +5,7 @@ Collect and feature quotes.
 ## Features
 - Add, re-state (Featured / Review / Archive) and remove quotes
 - Featured quotes sort first; search by author, quote or state
+- Copy static, escaped embed HTML of the Featured quotes
 - localStorage persistence (validated on load)
 
 ## Limitations

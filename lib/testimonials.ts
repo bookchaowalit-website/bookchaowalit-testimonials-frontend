@@ -42,3 +42,20 @@ export function parseQuotes(raw: string | null): Quote[] | null {
     return null;
   }
 }
+
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+/**
+ * Static, escaped HTML for the Featured quotes, in their current order, so the
+ * curated set can be pasted into another site. Returns "" when none are featured.
+ */
+export function featuredEmbedHtml(quotes: Quote[]): string {
+  const featured = quotes.filter((quote) => quote.state === "Featured");
+  if (featured.length === 0) return "";
+  const figures = featured.map(
+    (quote) => `  <figure class="testimonial">\n    <blockquote><p>${escapeHtml(quote.quote)}</p></blockquote>\n    <figcaption>${escapeHtml(quote.author)}</figcaption>\n  </figure>`,
+  );
+  return `<section class="testimonials">\n${figures.join("\n")}\n</section>\n`;
+}
