@@ -1,11 +1,12 @@
 import { handleRpc } from "@/lib/mcp";
+import { SITE_URL } from "@/lib/site";
 
 export const runtime = "edge";
 
 const APP = {
   name: "Testimonials",
   description: "Collect and feature testimonial quotes locally.",
-  url: "https://bookchaowalit-testimonials-frontend.vercel.app",
+  url: SITE_URL,
 };
 
 export async function POST(request: Request) {

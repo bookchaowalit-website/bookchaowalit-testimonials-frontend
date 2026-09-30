@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
   keywords: ["testimonials", "portfolio"],
   authors: [{ name: "Bookchaowalit", url: "https://bookchaowalit.com" }],
   creator: "Bookchaowalit",
-  metadataBase: new URL("https://bookchaowalit.com"),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     type: "website",
     title: "Testimonials | Bookchaowalit",
