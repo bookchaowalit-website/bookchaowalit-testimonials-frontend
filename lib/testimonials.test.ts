@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createQuote, featuredEmbedHtml, parseQuotes, visibleQuotes, type Quote } from "./testimonials";
+import { createQuote, featuredEmbedHtml, MAX_AUTHOR, MAX_QUOTE, parseQuotes, visibleQuotes, type Quote } from "./testimonials";
 
 const quotes: Quote[] = [
   { id: "a", author: "Ann", quote: "Solid work", state: "Review" },
@@ -51,5 +51,26 @@ describe("featuredEmbedHtml", () => {
 
   it("is empty when nothing is featured", () => {
     expect(featuredEmbedHtml([{ id: "1", author: "A", quote: "q", state: "Archive" }])).toBe("");
+  });
+});
+
+describe("edge cases", () => {
+  it("rejects an author or quote made only of zero-width characters", () => {
+    expect(createQuote("\u200B", "Great work", "Review", "q1")).toHaveProperty("error");
+    expect(createQuote("Mina", "\u200D\uFEFF", "Review", "q1")).toHaveProperty("error");
+    expect(createQuote("Mina", "\uFEFF“Great”", "Review", "q1")).toMatchObject({ quote: "Great" });
+  });
+
+  it("never cuts an emoji in half at the length limits", () => {
+    const quote = createQuote(`${"a".repeat(MAX_AUTHOR - 1)}😀`, `${"b".repeat(MAX_QUOTE - 1)}🎉!`, "Review", "q1");
+    expect(quote).toMatchObject({ author: "a".repeat(MAX_AUTHOR - 1), quote: "b".repeat(MAX_QUOTE - 1) });
+  });
+
+  it("drops stored quotes that repeat an id", () => {
+    const raw = JSON.stringify([
+      { id: "a", author: "One", quote: "First", state: "Featured" },
+      { id: "a", author: "Two", quote: "Second", state: "Review" },
+    ]);
+    expect(parseQuotes(raw)?.map((q) => q.author)).toEqual(["One"]);
   });
 });

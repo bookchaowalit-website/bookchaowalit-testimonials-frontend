@@ -21,3 +21,13 @@ Score: 8/10 (was 7/10) — full local CRUD with featured ordering, validated sto
 
 - Canonical host is config-driven: `lib/site.ts` resolves `NEXT_PUBLIC_SITE_URL` (validated, clear error on a non-http(s) value) and feeds `metadataBase`, generated `app/sitemap.ts` / `app/robots.ts` and the MCP `get_app_info` URL; removed the stale template `public/sitemap.xml` / `robots.txt` (they pointed at `bookchaowalit.com` and a `*.vercel.app` name that differs from the project URL). Tested in `lib/site.test.ts`.
 - "Embed the featured quotes": static, HTML-escaped `<figure>` markup of every Featured proof in display order (`featuredEmbedHtml` in `lib/testimonials.ts`, tested incl. script-injection escaping), shown read-only with a Copy button and a visible status line.
+
+## Done in this pass (pass 3)
+- Edge-case pass on `lib/testimonials.ts` (regression tests in `lib/testimonials.test.ts`):
+  - `createQuote` accepted an author or quote made only of zero-width
+    characters / BOM (a blank card that could be Featured and embedded); these
+    are now stripped and rejected.
+  - Author / quote were cut with `slice`, leaving half an emoji (lone
+    surrogate) at `MAX_AUTHOR` / `MAX_QUOTE`; the whole emoji is now dropped.
+  - `parseQuotes` kept stored quotes with a repeated id (duplicate React keys;
+    one state change moved both); only the first is kept.

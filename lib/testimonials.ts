@@ -17,9 +17,18 @@ export function visibleQuotes(quotes: Quote[], query: string): Quote[] {
     .map(({ item }) => item);
 }
 
+const INVISIBLE = /[\u200B-\u200D\u2060\uFEFF]/g;
+
+/** Trim, drop zero-width characters / BOM, cut to `max` UTF-16 units without splitting an emoji. */
+function clean(text: string, max: number): string {
+  const value = text.replace(INVISIBLE, "").trim();
+  if (value.length <= max) return value;
+  return value.slice(0, /[\uD800-\uDBFF]/.test(value[max - 1]) ? max - 1 : max).trimEnd();
+}
+
 export function createQuote(author: string, quote: string, state: State, id: string): Quote | { error: string } {
-  const cleanAuthor = author.trim().slice(0, MAX_AUTHOR);
-  const cleanQuote = quote.trim().replace(/^["“”]+|["“”]+$/g, "").trim().slice(0, MAX_QUOTE);
+  const cleanAuthor = clean(author, MAX_AUTHOR);
+  const cleanQuote = clean(quote.replace(INVISIBLE, "").trim().replace(/^["“”]+|["“”]+$/g, ""), MAX_QUOTE);
   if (!cleanAuthor || !cleanQuote) return { error: "Add both an author and a quote before exposing it." };
   return { id, author: cleanAuthor, quote: cleanQuote, state };
 }
@@ -33,10 +42,15 @@ export function parseQuotes(raw: string | null): Quote[] | null {
   try {
     const data: unknown = JSON.parse(raw);
     if (!Array.isArray(data)) return null;
+    // Ids key the rows and every edit; a repeated id keeps only its first quote.
+    const seen = new Set<string>();
     return data.filter((item): item is Quote => {
       if (typeof item !== "object" || item === null) return false;
       const q = item as Record<string, unknown>;
-      return typeof q.id === "string" && typeof q.author === "string" && typeof q.quote === "string" && isState(q.state);
+      if (!(typeof q.id === "string" && typeof q.author === "string" && typeof q.quote === "string" && isState(q.state))) return false;
+      if (seen.has(q.id)) return false;
+      seen.add(q.id);
+      return true;
     });
   } catch {
     return null;
