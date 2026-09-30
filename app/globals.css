@@ -24,3 +24,7 @@ button, input, textarea, select { font: inherit; } button { cursor: pointer; }
 .develop-button { align-items: center; background: #f5a25d; border: 0; color: #1b1511; display: flex; justify-content: space-between; margin-top: 27px; padding: 14px 16px; width: 100%; } .develop-button:hover { background: #f5e8cc; } .develop-button span { font-size: 22px; }
 .darkroom-footer { border-top: 1px solid #634c39; color: #bca889; justify-content: space-between; margin: 62px auto 0; max-width: 1280px; padding-top: 18px; }
 @media (max-width: 780px) { .lab-note { display: none; } .darkroom-hero { align-items: start; flex-direction: column; gap: 45px; margin: 85px auto 70px; } .darkroom-hero h1 { font-size: clamp(58px, 18vw, 92px); } .exposure-readout { min-width: 175px; } .sheet-head { align-items: stretch; flex-direction: column; } .darkroom-search { max-width: none; } .proof-grid { grid-template-columns: 1fr; margin-top: 35px; } .proof { min-height: 230px; } .develop-tray { grid-template-columns: 1fr; margin-top: 70px; } .darkroom-footer { align-items: start; flex-direction: column; gap: 8px; } }
+.proof-state { border: 0; background: transparent; color: #f5a25d; font: inherit; letter-spacing: inherit; text-transform: uppercase; cursor: pointer; }
+.proof-state option { color: #1a1411; }
+.tray-notice { min-height: 1.4em; margin: 10px 0 0; font-size: 12px; opacity: .8; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
